@@ -1,4 +1,3 @@
-
 const paragraphs = [
   "You do not rise to the level of your goals. You fall to the level of your systems. Your system is perfectly designed to give you the results you’re getting.",
   "Every action you take is a vote for the type of person you wish to become. No single instance will transform your beliefs, but as the votes build up, so does the evidence of your new identity.",
@@ -13,9 +12,9 @@ const paragraphs = [
 ];
 
 let currentParagraph = 0;
-let timer = 0;
-let interval = null;
 let isTestRunning = false;
+let startTime = 0;
+let interval = null;
 
 const quoteElement = document.getElementById('quote');
 const quoteInput = document.getElementById('quoteInput');
@@ -29,7 +28,6 @@ const popupAccuracy = document.getElementById('popup-accuracy');
 const prevBtn = document.getElementById('prevParagraph');
 const nextBtn = document.getElementById('nextParagraph');
 const paragraphIndicator = document.getElementById('paragraphIndicator');
-
 
 function renderQuote(quote, userInput = "") {
   quoteElement.innerHTML = "";
@@ -49,58 +47,52 @@ function renderQuote(quote, userInput = "") {
   }
 }
 
-
 function loadParagraph(index) {
   renderQuote(paragraphs[index]);
   quoteInput.value = '';
-  timer =0;
   timerElement.textContent = '0';
   wpmElement.textContent = '0';
   accuracyElement.textContent = '100%';
   isTestRunning = false;
   clearInterval(interval);
   popup.classList.add('hidden');
-  paragraphIndicator.textContent = `Paragraph ${index + 1} of ${paragraph.length}`;
-
-}
-
-function startTimer() {
-  if (!isTestRunning) {
-    isTestRunning = true;
-    interval = setInterval(() => {
-      timer++;
-      timerElement.textContent = timer;
-    }, 1000);
-  }
-}
-
-function calculateWPM(text, time) {
-  const words = text.trim().split(/\s+/).length;
-  return time > 0 ? Math.round((words / time) * 60) : 0;
+  paragraphIndicator.textContent = `Paragraph ${index + 1} of ${paragraphs.length}`;
+  startTime = 0;
 }
 
 function calculateAccuracy(input, quote) {
   let correct = 0;
-  for (let i = 0; i < input.length; i++) {
+  for (let i = 0; i < input.length && i < quote.length; i++) {
     if (input[i] === quote[i]) correct++;
   }
   return quote.length > 0 ? Math.round((correct / quote.length) * 100) : 100;
 }
 
 quoteInput.addEventListener('input', () => {
-  startTimer();
   const input = quoteInput.value;
   const quote = paragraphs[currentParagraph];
-  renderQuote(quote,input);
-  const wpm = calculateWPM(input, timer);
-  const accuracy = calculateAccuracy(input, quote);
+  renderQuote(quote, input);
+  if (!isTestRunning && input.length > 0) {
+    isTestRunning = true;
+    startTime = Date.now();
+    interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      timerElement.textContent = elapsed;
+    }, 1000);
+  }
 
+  const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+  timerElement.textContent = elapsed;
+
+  const wpm = elapsed > 0 ? Math.round((input.trim().split(/\s+/).length / elapsed) * 60) : 0;
   wpmElement.textContent = wpm;
+
+  const accuracy = calculateAccuracy(input, quote);
   accuracyElement.textContent = `${accuracy}%`;
 
   if (input === quote) {
     clearInterval(interval);
-    popupTime.textContent = timer;
+    popupTime.textContent = elapsed;
     popupWpm.textContent = wpm;
     popupAccuracy.textContent = accuracy;
     popup.classList.remove('hidden');
