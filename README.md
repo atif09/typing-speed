@@ -1,4 +1,4 @@
-# Typ
+# TypingSpeed
 
 TypePulse is a modern typing speed test web app that provides real-time feedback on your accuracy and speed.  
 [Try it live on Vercel](https://typingspeed-theta.vercel.app/)
@@ -18,6 +18,11 @@ TypePulse is a modern typing speed test web app that provides real-time feedback
 - Result popup for each attempt, even if unfinished
 - Clean, responsive, and accessible design
 
+## Customization
+
+- To add or change practice paragraphs, edit the `paragraphs` array in `script.js`.
+- You can further style the app by modifying `styles/styles.css`.
+  
 ## Project Structure
 
 <details>
