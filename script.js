@@ -1,63 +1,133 @@
-const quotes =[ 
-  "You do not rise to the level of your goals. You fall to the level of your systems.",
-  "Every action you take is a vote for the type of person you wish to become.",
-  "Habits are the compound interest of self-improvement",
-  "You should be far more concerned with your current trajectory than with your current results.",
-  "The most effective way to change your habits is to focus not on what you want to achieve, but on who you wish to become.",
-  "Success is the product of daily habits, not once-in-a-lifetime transformation.",
-  "Small changes often appear to make no difference until you cross a criticial threshold.",
-  "Be the designer of your world and not merely the consumer of it.",
-  "You don't have to be the victim of your environment. You can also be the architect of it.",
-  "You get what you repeat.",
-  "The task of building a good habit is like cultivating a delicate flower one day at a time. It won't bloom overnight, but it will bloom if you keep watering it."
+
+const paragraphs = [
+  "You do not rise to the level of your goals. You fall to the level of your systems. Your system is perfectly designed to give you the results you’re getting.",
+  "Every action you take is a vote for the type of person you wish to become. No single instance will transform your beliefs, but as the votes build up, so does the evidence of your new identity.",
+  "Habits are the compound interest of self-improvement. The effects of your habits multiply as you repeat them. They seem to make little difference on any given day and yet the impact they deliver over months and years can be enormous.",
+  "The most practical way to change who you are is to change what you do. Each habit not only gets results but also teaches you something far more important: to trust yourself.",
+  "The task of building a good habit is like cultivating a delicate flower one day at a time. It won’t bloom overnight, but it will bloom if you keep watering it.",
+  "You should be far more concerned with your current trajectory than with your current results. If you're improving even 1% every day, you'll be in a completely different place a year from now.",
+  "When nothing seems to help, I go and look at a stonecutter hammering away at his rock. He may hit it a hundred times without a crack showing, yet at the hundred and first blow it will split in two.",
+  "The work that hurts you now will bless you later. The costs of your good habits are in the present. The costs of your bad habits are in the future.",
+  "You don’t have to be the victim of your environment. You can be the architect of it. Design beats discipline when discipline fails.",
+  "It is not about having something to motivate you—it is about becoming someone who doesn’t need to be motivated all the time."
 ];
 
-let currentQuote='';
-let startTime;
+let currentParagraph = 0;
+let timer = 0;
+let interval = null;
+let isTestRunning = false;
 
-const quoteDisplay = document.getElementById('quote');
-const inputBox= document.getElementById('input');
-const resultDisplay = document.getElementById('result');
-const startButton = document.getElementById('startBtn');
+const quoteElement = document.getElementById('quote');
+const quoteInput = document.getElementById('quoteInput');
+const timerElement = document.getElementById('timer');
+const wpmElement = document.getElementById('wpm');
+const accuracyElement = document.getElementById('accuracy');
+const popup = document.getElementById('popup');
+const popupTime = document.getElementById('popup-time');
+const popupWpm = document.getElementById('popup-wpm');
+const popupAccuracy = document.getElementById('popup-accuracy');
+const prevBtn = document.getElementById('prevParagraph');
+const nextBtn = document.getElementById('nextParagraph');
+const paragraphIndicator = document.getElementById('paragraphIndicator');
 
-function getRandomQuote() {
-  const randomindex = Math.floor(Math.random() * quotes.length);
-  return quotes[randomindex];
-}
 
-function startTest() {
-  currentQuote = getRandomQuote();
-  quoteDisplay.textContent = currentQuote;
-  inputBox.value='';
-  resultDisplay.textContent='';
-  startTime = new Date().getTime();
-  inputBox.disabled = false;
-  inputBox.focus();
-}
-
-function endTest() {
-  const endTime = new Date().getTime();
-  const totalTime = (endTime - startTime) / 1000;
-  const userText = inputBox.value.trim();
-
-  const wordsTyped = userText.split(" ").length;
-  const speed = Math.round((wordsTyped/totalTime) * 60);
-
-  const isCorrect = userText === currentQuote;
-
-  if (isCorrect) {
-    resultDisplay.innerHTML= `ok fast fingers <br>Typing Speed: <b>${speed} WPM</b>`;
-  } else {
-    resultDisplay.innerHTML = `get it accurate next time!`;
+function renderQuote(quote, userInput = "") {
+  quoteElement.innerHTML = "";
+  for (let i = 0; i < quote.length; i++) {
+    const span = document.createElement("span");
+    span.textContent = quote[i];
+    if (i < userInput.length) {
+      if (userInput[i] === quote[i]) {
+        span.className = "correct";
+      } else {
+        span.className = "incorrect";
+      }
+    } else {
+      span.className = "";
+    }
+    quoteElement.appendChild(span);
   }
-
-  inputBox.disabled = true;
 }
 
-inputBox.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
-    endTest();
+
+function loadParagraph(index) {
+  renderQuote(paragraphs[index]);
+  quoteInput.value = '';
+  timer =0;
+  timerElement.textContent = '0';
+  wpmElement.textContent = '0';
+  accuracyElement.textContent = '100%';
+  isTestRunning = false;
+  clearInterval(interval);
+  popup.classList.add('hidden');
+  paragraphIndicator.textContent = `Paragraph ${index + 1} of ${paragraph.length}`;
+
+}
+
+function startTimer() {
+  if (!isTestRunning) {
+    isTestRunning = true;
+    interval = setInterval(() => {
+      timer++;
+      timerElement.textContent = timer;
+    }, 1000);
+  }
+}
+
+function calculateWPM(text, time) {
+  const words = text.trim().split(/\s+/).length;
+  return time > 0 ? Math.round((words / time) * 60) : 0;
+}
+
+function calculateAccuracy(input, quote) {
+  let correct = 0;
+  for (let i = 0; i < input.length; i++) {
+    if (input[i] === quote[i]) correct++;
+  }
+  return quote.length > 0 ? Math.round((correct / quote.length) * 100) : 100;
+}
+
+quoteInput.addEventListener('input', () => {
+  startTimer();
+  const input = quoteInput.value;
+  const quote = paragraphs[currentParagraph];
+  renderQuote(quote,input);
+  const wpm = calculateWPM(input, timer);
+  const accuracy = calculateAccuracy(input, quote);
+
+  wpmElement.textContent = wpm;
+  accuracyElement.textContent = `${accuracy}%`;
+
+  if (input === quote) {
+    clearInterval(interval);
+    popupTime.textContent = timer;
+    popupWpm.textContent = wpm;
+    popupAccuracy.textContent = accuracy;
+    popup.classList.remove('hidden');
+    isTestRunning = false;
   }
 });
 
-startButton.addEventListener('click', startTest);
+function restartTest() {
+  loadParagraph(currentParagraph);
+}
+
+prevBtn.addEventListener('click', () => {
+  if (currentParagraph > 0) {
+    currentParagraph--;
+    loadParagraph(currentParagraph);
+  }
+});
+
+nextBtn.addEventListener('click', () => {
+  if (currentParagraph < paragraphs.length - 1) {
+    currentParagraph++;
+    loadParagraph(currentParagraph);
+  }
+});
+
+window.onload = () => {
+  loadParagraph(currentParagraph);
+};
+
+window.restartTest = restartTest;
