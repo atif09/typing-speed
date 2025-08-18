@@ -11,6 +11,7 @@
     <h1>Typing Speed Test</h1>
     <div id="quote"></div>
     <textarea id="quoteInput" placeholder="Start typing..." rows="6"></textarea>
+    <button id="showResultBtn" type="button">Show Result</button>
     <div class="info">
       <p>Time: <span id="timer">0</span>s</p>
       <p>WPM: <span id="wpm">0</span></p>
@@ -25,18 +26,16 @@
 
   <div id="popup" class="popup hidden">
     <div class="popup-content">
-      <h2>Test Completed</h2>
+      <h2>Test Result</h2>
       <p><strong>Time Taken:</strong> <span id="popup-time"></span> seconds</p>
-      <p><strong>WPM:</strong> <span id="popup-wpm"></span></p>
       <p><strong>Accuracy:</strong> <span id="popup-accuracy"></span>%</p>
-      <button onclick="restartTest()">Try Again</button>
+      <button id="closePopupBtn" type="button">Close</button>
     </div>
   </div>
 
   <script src="script.js"></script>
+  <script src="resultPopup.js"></script>
 </body>
 </html>
-
-
 
 

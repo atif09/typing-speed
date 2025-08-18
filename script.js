@@ -21,10 +21,6 @@ const quoteInput = document.getElementById('quoteInput');
 const timerElement = document.getElementById('timer');
 const wpmElement = document.getElementById('wpm');
 const accuracyElement = document.getElementById('accuracy');
-const popup = document.getElementById('popup');
-const popupTime = document.getElementById('popup-time');
-const popupWpm = document.getElementById('popup-wpm');
-const popupAccuracy = document.getElementById('popup-accuracy');
 const prevBtn = document.getElementById('prevParagraph');
 const nextBtn = document.getElementById('nextParagraph');
 const paragraphIndicator = document.getElementById('paragraphIndicator');
@@ -40,9 +36,8 @@ function renderQuote(quote, userInput = "") {
       } else {
         span.className = "incorrect";
       }
-    } else {
-      span.className = "";
     }
+    
     quoteElement.appendChild(span);
   }
 }
@@ -55,7 +50,7 @@ function loadParagraph(index) {
   accuracyElement.textContent = '100%';
   isTestRunning = false;
   clearInterval(interval);
-  popup.classList.add('hidden');
+  document.getElementById('popup').classList.add('hidden');
   paragraphIndicator.textContent = `Paragraph ${index + 1} of ${paragraphs.length}`;
   startTime = 0;
 }
@@ -72,6 +67,8 @@ quoteInput.addEventListener('input', () => {
   const input = quoteInput.value;
   const quote = paragraphs[currentParagraph];
   renderQuote(quote, input);
+
+  // Start timer on first keystroke
   if (!isTestRunning && input.length > 0) {
     isTestRunning = true;
     startTime = Date.now();
@@ -92,10 +89,9 @@ quoteInput.addEventListener('input', () => {
 
   if (input === quote) {
     clearInterval(interval);
-    popupTime.textContent = elapsed;
-    popupWpm.textContent = wpm;
-    popupAccuracy.textContent = accuracy;
-    popup.classList.remove('hidden');
+    document.getElementById('popup-time').textContent = elapsed;
+    document.getElementById('popup-accuracy').textContent = accuracy;
+    document.getElementById('popup').classList.remove('hidden');
     isTestRunning = false;
   }
 });
@@ -121,5 +117,3 @@ nextBtn.addEventListener('click', () => {
 window.onload = () => {
   loadParagraph(currentParagraph);
 };
-
-window.restartTest = restartTest;
