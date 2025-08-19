@@ -39,7 +39,3 @@ mini_project3/
 └── README.md
 ```
 
-## Customization
-
-- To add or change practice paragraphs, edit the `paragraphs` array in `script.js`.
-- You can further style the app by modifying `styles/styles.css`.
